@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simulasi Video Call</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="screen">
+    <!-- remote video -->
+    <video id="remoteVideo" autoplay muted loop playsinline>
+      <source src="https://ik.imagekit.io/sodejjlov/TJ0kkRjsSOmBQQA1.mp4?updatedAt=1756404590816" type="video/mp4">
+    </video>
+  </div>
+
+  <!-- INCOMING SCREEN -->
+  <div id="incomingScreen">
+    <div style="text-align:center">
+      <div id="incomingName">Gisel❤️✨️</div>
+      <div id="incomingSub">Panggilan Masuk…</div>
+    </div>
+
+    <div class="incoming-actions">
+      <button id="declineBtn" class="ring-btn ring-decline" title="Decline">
+        <img src="https://ik.imagekit.io/sodejjlov/20250829_003238.png?updatedAt=1756402559488" alt="Decline" style="width:80px;height:80px;">
+      </button>
+      <button id="acceptBtn" class="ring-btn ring-accept" title="Accept">
+        <img src="https://ik.imagekit.io/sodejjlov/20250829_003238.png?updatedAt=1756402559488" alt="Answer" style="width:100px;height:100px;">
+      </button>
+    </div>
+    <audio id="ringTone" src="https://ik.imagekit.io/sodejjlov/phone-outgoing-call-72202.mp3?updatedAt=1756406266354" loop preload="auto"></audio>
+  </div>
+
+  <!-- local preview -->
+  <div id="localWrap" class="hidden" aria-hidden="false">
+    <video id="localVideo" autoplay playsinline muted></video>
+    <canvas id="blurCanvas"></canvas>
+    <div id="camOffIcon"><img src="./assets/camera-off.svg" alt="camera off"></div>
+  </div>
+
+  <div id="callTimer">00:00</div>
+
+  <div class="controls" id="controls">
+    <button id="btnSwitch" class="ctrl" title="Switch camera"><img src="https://ik.imagekit.io/sodejjlov/20250829_003435.png?updatedAt=1756402559234" alt="switch" style="width:50px;height:50px;"></button>
+    <button id="btnCamera" class="ctrl" title="Toggle camera"><img id="iconCamera" src="https://ik.imagekit.io/sodejjlov/20250829_003336.png?updatedAt=1756402559469" alt="camera" style="width:50px;height:50px;"></button>
+    <button id="btnMute" class="ctrl" title="Mute mic"><img id="iconMic" src="https://ik.imagekit.io/sodejjlov/20250829_003408.png?updatedAt=1756402559507" alt="mic" style="width:50px;height:50px;"></button>
+    <button id="btnEnd" class="ctrl end" title="End call"><img src="https://ik.imagekit.io/sodejjlov/20250829_003238.png?updatedAt=1756402559488" alt="end" style="width:50px;height:50px;"></button>
+  </div>
+
+  <div class="controlsLabel" id="controlsLabel">Switch · Camera · Mute · End</div>
+
+  <script src="app.js"></script>
+</body>
+</html>

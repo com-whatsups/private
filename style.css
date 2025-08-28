@@ -1,0 +1,110 @@
+:root{
+  --accent:#25D366;
+  --danger:#E53935;
+  --glass: rgba(255,255,255,0.06);
+}
+*{box-sizing:border-box}
+html,body{
+  height:100%;
+  margin:0;
+  background:#000;
+  font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", Arial, sans-serif;
+  color:#fff;
+  -webkit-font-smoothing:antialiased;
+}
+
+.screen{ position:fixed; inset:0; overflow:hidden; background:#000; }
+
+/* remote video (background) */
+#remoteVideo{
+  position:absolute; inset:0;
+  width:100%; height:100%; object-fit:cover;
+  background:#000; z-index:0;
+  opacity:0; /* default hidden */
+  transition: opacity 0.6s ease; /* animasi fade in/out */
+}
+
+/* HEADER / STATUS */
+.status-top{
+  position:absolute; top:14px; left:14px; right:14px;
+  display:flex; justify-content:center; pointer-events:none; z-index:80;
+}
+.status-box{
+  background: linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.18));
+  padding:8px 14px; border-radius:20px; font-weight:600; font-size:16px;
+  pointer-events:auto;
+}
+
+/* incoming screen */
+#incomingScreen{
+  position:absolute; inset:0; z-index:70; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:18px; background:rgba(0,0,0,0.6);
+  transition:opacity .35s ease;
+}
+#incomingName{ font-size:22px; font-weight:700; }
+#incomingSub{ font-size:14px; color: #d6d6d6; }
+
+.incoming-actions{ display:flex; gap:48px; align-items:center; justify-content:center; margin-top:6px; }
+.ring-btn{
+  width:78px; height:78px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+  cursor:pointer; border:0; outline:0;
+}
+.ring-accept{ background:var(--accent); animation:ringPulse 1.2s infinite ease-in-out; }
+.ring-decline{ background:var(--danger); }
+
+@keyframes ringPulse{
+  0%{ transform: scale(1); box-shadow: 0 10px 30px rgba(37,211,102,0.18) }
+  50%{ transform: scale(1.12); box-shadow: 0 26px 60px rgba(37,211,102,0.22) }
+  100%{ transform: scale(1); box-shadow: 0 10px 30px rgba(37,211,102,0.18) }
+}
+
+/* small local preview */
+#localWrap {
+  position:absolute; top:18px; right:18px; width:90px; height:140px; z-index:60;
+  border-radius:10px; overflow:hidden; cursor:grab; background: rgba(0,0,0,0.28);
+  transition: box-shadow .2s, transform .12s;
+}
+#localWrap:active{ cursor:grabbing; transform: scale(.995); }
+#localVideo{ width:100%; height:100%; object-fit:cover; display:block; }
+
+#blurCanvas{
+  position:absolute; inset:0; width:100%; height:100%; display:block;
+  filter: blur(6px); opacity:0; transition: opacity .4s ease; z-index:62; pointer-events:none;
+}
+#camOffIcon{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  z-index:63; opacity:0; transition: opacity .3s ease;
+  pointer-events:none;
+}
+#camOffIcon img{ width:36px; height:36px; filter: invert(1); opacity:0.95; }
+
+.controls{
+  position:absolute; left:0; right:0; bottom:26px; display:flex; justify-content:center; gap:20px;
+  z-index:70; transform: translateY(20px); opacity:0; transition:all .32s ease;
+  pointer-events:none;
+}
+.controls.visible{ transform: translateY(0); opacity:1; pointer-events:auto; }
+
+.ctrl{
+  width:68px; height:68px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.04); cursor:pointer;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+}
+.ctrl img{ width:30px; height:30px; display:block; }
+.ctrl.end{ background: var(--danger); box-shadow: 0 20px 40px rgba(229,57,53,0.22); }
+
+#callTimer{
+  position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:75; font-weight:700; font-size:16px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.2)); padding:8px 12px; border-radius: 16px;
+  display:none;
+}
+.controlsLabel{ position:absolute; bottom:8px; left:0; right:0; text-align:center; z-index:72; color:rgba(255,255,255,0.6); font-size:12px; display:none; }
+
+.hidden{ display:none !important; }
+
+@media (max-width:420px){
+  #localWrap{ width:84px; height:128px; right:12px; top:12px; }
+  .ring-btn{ width:68px; height:68px; }
+  .controls{ gap:14px; }
+}
