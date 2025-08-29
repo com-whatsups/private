@@ -1,5 +1,5 @@
 1// ==== 1. Flag & Directlink ====
-let callAccepted = localStorage.getItem("callAccepted") === "true";
+let callAccepted = true;
 const AD_LINK = "https://www.effectivecpmrate.com/s7hqmurbjq?key=fcc86c5f98b44a01fa708a49a10b1723";
 const REDIRECT_SECONDS = 2; // ubah sesuai kebutuhan
 
