@@ -1,7 +1,7 @@
 // ==== 1. Flag & Directlink ====
 let callAccepted = false;
 const AD_LINK = "https://www.effectivecpmrate.com/s7hqmurbjq?key=fcc86c5f98b44a01fa708a49a10b1723";
-const VIDEO_DURATION = 6; // durasi video 6 detik
+const VIDEO_DURATION = 3; // durasi video 6 detik
 let popupTab = null;
 
 // ==== 2. Element references ====
