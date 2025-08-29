@@ -89,7 +89,7 @@ function showContinueOverlay() {
     `;
     document.body.appendChild(overlay);
 
-    document.getElementById('continueBtn').addEventListener('click', ()=>{
+    document.getElementById('continueBtn').addEventListener('click', handler, { once:true })=>{
         overlay.remove();
         openOrRedirectPopup();
         remoteVideo.play().catch(console.error);
