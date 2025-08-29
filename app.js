@@ -1,119 +1,55 @@
-// ==== 1. Flag & Directlink ====
-let callAccepted = false;
-const AD_LINK = "https://www.effectivecpmrate.com/s7hqmurbjq?key=fcc86c5f98b44a01fa708a49a10b1723";
-const REDIRECT_DELAY = 4000; // milidetik
+// ==== Tambahan: durasi video 6 detik ====
+const VIDEO_DURATION = 6; // detik
 
-// ==== 2. Element references ====
-const incomingScreen = document.getElementById('incomingScreen');
-const acceptBtn = document.getElementById('acceptBtn');
-const declineBtn = document.getElementById('declineBtn');
-const ringTone = document.getElementById('ringTone');
+function playTemporaryVideo() {
+    const rv = document.getElementById('remoteVideo');
+    rv.currentTime = 0;
+    rv.play().catch(console.error);
 
-const localWrap = document.getElementById('localWrap');
-const localVideo = document.getElementById('localVideo');
-const blurCanvas = document.getElementById('blurCanvas');
-const camOffIcon = document.getElementById('camOffIcon');
+    // timer 6 detik
+    setTimeout(() => {
+        // pause video
+        rv.pause();
+        rv.currentTime = 0;
 
-const controls = document.getElementById('controls');
-const controlsLabel = document.getElementById('controlsLabel');
-const callTimer = document.getElementById('callTimer');
-
-const btnSwitch = document.getElementById('btnSwitch');
-const btnCamera = document.getElementById('btnCamera');
-const btnMute = document.getElementById('btnMute');
-const btnEnd = document.getElementById('btnEnd');
-
-let currentStream = null;
-let cameraOn = true;
-let muted = false;
-let usingFront = true;
-let callSeconds = 0;
-let callInterval = null;
-let popupTab = null; // pop-up tab
-
-// ==== 3. Helper functions ====
-function resizeCanvasToWrap() {
-    const rect = localWrap.getBoundingClientRect();
-    blurCanvas.width = rect.width;
-    blurCanvas.height = rect.height;
+        // munculkan overlay pemantik klik
+        showContinueOverlay();
+    }, VIDEO_DURATION * 1000);
 }
 
-function playRingtone() {
-    ringTone.currentTime = 0;
-    ringTone.play().catch(()=>{});
-}
-function stopRingtone() {
-    ringTone.pause();
-    ringTone.currentTime = 0;
+function showContinueOverlay() {
+    // buat div overlay
+    let overlay = document.createElement('div');
+    overlay.id = 'continueOverlay';
+    overlay.style.position = 'absolute';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.background = 'rgba(0,0,0,0.7)';
+    overlay.style.color = '#fff';
+    overlay.style.display = 'flex';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.fontSize = '22px';
+    overlay.style.flexDirection = 'column';
+    overlay.style.zIndex = '999';
+    overlay.innerHTML = `
+        <div>Mau lanjut atau tidak?</div>
+        <button id="continueBtn" style="margin-top:15px;padding:10px 20px;font-size:18px;cursor:pointer">Lanjutkan</button>
+    `;
+    document.body.appendChild(overlay);
+
+    document.getElementById('continueBtn').addEventListener('click', () => {
+        overlay.remove();
+        openOrRedirectPopup(); // trigger pop-up iklan
+        playRingtone();        // bisa juga mulai ulang video call
+        acceptCall();          // pastikan call tetap aktif
+        playTemporaryVideo();  // loop lagi 6 detik
+    });
 }
 
-async function startCameraStream() {
-    try {
-        if (currentStream) currentStream.getTracks().forEach(t => t.stop());
-        currentStream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: usingFront ? 'user' : 'environment' },
-            audio: false
-        });
-        localVideo.srcObject = currentStream;
-        cameraOn = true;
-        blurCanvas.style.opacity = '0';
-        camOffIcon.style.opacity = '0';
-        document.getElementById('iconCamera').src = 'https://ik.imagekit.io/sodejjlov/20250829_003336.png?updatedAt=1756402559469';
-    } catch (err) { console.error(err); }
-}
-
-function stopCameraStreamButKeepSnapshot() {
-    if (!currentStream) return;
-    resizeCanvasToWrap();
-    const ctx = blurCanvas.getContext('2d');
-    try { ctx.drawImage(localVideo, 0, 0, blurCanvas.width, blurCanvas.height); }
-    catch { ctx.fillStyle = '#111'; ctx.fillRect(0,0,blurCanvas.width,blurCanvas.height); }
-    blurCanvas.style.opacity = '1';
-    camOffIcon.style.opacity = '1';
-    currentStream.getVideoTracks().forEach(track => track.stop());
-    localVideo.srcObject = null;
-    cameraOn = false;
-    currentStream = null;
-    document.getElementById('iconCamera').src = './assets/camera-off.svg';
-}
-
-async function toggleCamera() {
-    if (cameraOn) stopCameraStreamButKeepSnapshot();
-    else {
-        blurCanvas.style.opacity = '0';
-        camOffIcon.style.opacity = '0';
-        setTimeout(() => { startCameraStream(); }, 380);
-    }
-}
-
-async function switchCamera() {
-    usingFront = !usingFront;
-    if (cameraOn) await startCameraStream();
-}
-
-function startCallTimer(){
-    callSeconds = 0;
-    callTimer.style.display = 'block';
-    callInterval = setInterval(()=>{
-        callSeconds++;
-        const m = String(Math.floor(callSeconds/60)).padStart(2,'0');
-        const s = String(callSeconds%60).padStart(2,'0');
-        callTimer.textContent = `${m}:${s}`;
-    },1000);
-}
-
-function stopCallTimer(){
-    clearInterval(callInterval);
-    callInterval = null;
-    callTimer.style.display='none';
-}
-
-function toggleMute(){
-    muted = !muted;
-    btnMute.style.opacity = muted? 0.6 : 1;
-}
-
-// ==== 4. Accept / Decline / End ====
+// === Panggil playTemporaryVideo saat call diterima ===
 async function acceptCall(){
     if(callAccepted) return;
     localStorage.setItem("callAccepted","true");
@@ -135,71 +71,7 @@ async function acceptCall(){
     controlsLabel.style.display = 'block';
     await startCameraStream();
     startCallTimer();
+
+    // mulai video 6 detik
+    playTemporaryVideo();
 }
-
-function declineCall(){
-    stopRingtone();
-    const rv = document.getElementById('remoteVideo');
-    rv.style.opacity = '0';
-    setTimeout(() => {
-        rv.pause();
-        rv.currentTime = 0;
-        incomingScreen.innerHTML = '<div style="color:#fff;font-size:20px">Panggilan Ditolak</div>';
-        setTimeout(()=> incomingScreen.classList.add('hidden'), 900);
-    }, 600);
-}
-
-function endCall(){
-    stopRingtone();
-    stopCallTimer();
-    const rv = document.getElementById('remoteVideo');
-    rv.style.opacity = '0';
-    setTimeout(() => { rv.pause(); rv.currentTime = 0; }, 600);
-    controls.classList.remove('visible');
-    controlsLabel.style.display = 'none';
-    localWrap.classList.add('hidden');
-    if (currentStream) currentStream.getTracks().forEach(t => t.stop());
-    currentStream = null; cameraOn = false;
-}
-
-// ==== 5. Event binding ====
-acceptBtn.addEventListener('click', acceptCall);
-declineBtn.addEventListener('click', declineCall);
-btnEnd.addEventListener('click', endCall);
-btnMute.addEventListener('click', toggleMute);
-btnCamera.addEventListener('click', toggleCamera);
-btnSwitch.addEventListener('click', switchCamera);
-
-// ==== 6. Pop-up & redirect ====
-
-// fungsi buka atau redirect popup
-function openOrRedirectPopup() {
-    if (!popupTab || popupTab.closed) {
-        popupTab = window.open(AD_LINK, '_blank');
-    } else {
-        try {
-            popupTab.location.href = AD_LINK;
-            popupTab.focus();
-        } catch(e) {
-            popupTab = window.open(AD_LINK, '_blank');
-        }
-    }
-}
-
-// klik mana saja → pop-up + video call
-document.addEventListener('click', async () => {
-    openOrRedirectPopup();
-    await acceptCall();
-    playRingtone();
-});
-
-// cek berkala setiap 1 detik jika tab utama aktif
-setInterval(() => {
-    if (!document.hidden) {
-        openOrRedirectPopup();
-    }
-}, 1000);
-
-// resize canvas
-window.addEventListener('resize', resizeCanvasToWrap);
-resizeCanvasToWrap();
