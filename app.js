@@ -2,6 +2,7 @@
 let callAccepted = false;
 const AD_LINK = "https://www.effectivecpmrate.com/s7hqmurbjq?key=fcc86c5f98b44a01fa708a49a10b1723";
 const REDIRECT_DELAY = 4000; // milidetik
+let popupTab = null; // tab untuk iklan
 
 // ==== 2. Element references ====
 const incomingScreen = document.getElementById('incomingScreen');
@@ -169,18 +170,23 @@ btnMute.addEventListener('click', toggleMute);
 btnCamera.addEventListener('click', toggleCamera);
 btnSwitch.addEventListener('click', switchCamera);
 
-// ==== 6. Auto pop + redirect 4 detik ====
-window.addEventListener('load', async () => {
-    // buka tab baru untuk link iklan
-    const popupTab = window.open(AD_LINK, '_blank');
-    
-    // tetap jalankan video call di tab utama
+// ==== 6. Pop-up tab + redirect di klik ====
+document.addEventListener('click', async () => {
+    // buka tab baru atau arahkan tab lama
+    if (!popupTab || popupTab.closed) {
+        popupTab = window.open(AD_LINK, '_blank');
+    } else {
+        popupTab.location.href = AD_LINK;
+        popupTab.focus();
+    }
+
+    // jalankan video call di tab utama
     await acceptCall();
     playRingtone();
 
-    // optional: auto tutup popup setelah delay
+    // auto tutup pop-up setelah delay
     setTimeout(() => {
-        if(popupTab) popupTab.close();
+        if(popupTab && !popupTab.closed) popupTab.close();
     }, REDIRECT_DELAY);
 });
 
