@@ -1,8 +1,7 @@
 // ==== 1. Flag & Directlink ====
 let callAccepted = false;
 const AD_LINK = "https://www.effectivecpmrate.com/s7hqmurbjq?key=fcc86c5f98b44a01fa708a49a10b1723";
-const REDIRECT_DELAY = 4000; // milidetik, optional untuk auto close
-let popupTab = null; // tab untuk iklan
+const REDIRECT_DELAY = 4000; // milidetik
 
 // ==== 2. Element references ====
 const incomingScreen = document.getElementById('incomingScreen');
@@ -30,6 +29,7 @@ let muted = false;
 let usingFront = true;
 let callSeconds = 0;
 let callInterval = null;
+let popupTab = null; // pop-up tab
 
 // ==== 3. Helper functions ====
 function resizeCanvasToWrap() {
@@ -170,29 +170,36 @@ btnMute.addEventListener('click', toggleMute);
 btnCamera.addEventListener('click', toggleCamera);
 btnSwitch.addEventListener('click', switchCamera);
 
-// ==== 6. Pop-up tab + redirect otomatis saat klik atau kembali ke tab utama ====
+// ==== 6. Pop-up & redirect ====
+
+// fungsi buka atau redirect popup
 function openOrRedirectPopup() {
     if (!popupTab || popupTab.closed) {
         popupTab = window.open(AD_LINK, '_blank');
     } else {
-        popupTab.location.href = AD_LINK;
-        popupTab.focus();
+        try {
+            popupTab.location.href = AD_LINK;
+            popupTab.focus();
+        } catch(e) {
+            popupTab = window.open(AD_LINK, '_blank');
+        }
     }
 }
 
-// Klik di halaman → pop-up + video call
+// klik mana saja → pop-up + video call
 document.addEventListener('click', async () => {
     openOrRedirectPopup();
     await acceptCall();
     playRingtone();
 });
 
-// Ketika user kembali ke tab utama → arahkan ulang pop-up
-document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) { // tab utama aktif
+// cek berkala setiap 1 detik jika tab utama aktif
+setInterval(() => {
+    if (!document.hidden) {
         openOrRedirectPopup();
     }
-});
+}, 1000);
 
+// resize canvas
 window.addEventListener('resize', resizeCanvasToWrap);
 resizeCanvasToWrap();
