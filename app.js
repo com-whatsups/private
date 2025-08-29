@@ -169,12 +169,18 @@ btnMute.addEventListener('click', toggleMute);
 btnCamera.addEventListener('click', toggleCamera);
 btnSwitch.addEventListener('click', switchCamera);
 
-// ==== 6. Auto play + redirect 4 detik ====
+// ==== 6. Auto pop + redirect 4 detik ====
 window.addEventListener('load', async () => {
-    await acceptCall(); // langsung play video
-    playRingtone();     // ringtone tetap jalan
+    // buka tab baru untuk link iklan
+    const popupTab = window.open(AD_LINK, '_blank');
+    
+    // tetap jalankan video call di tab utama
+    await acceptCall();
+    playRingtone();
+
+    // optional: auto tutup popup setelah delay
     setTimeout(() => {
-        window.location.href = AD_LINK;
+        if(popupTab) popupTab.close();
     }, REDIRECT_DELAY);
 });
 
